@@ -1,0 +1,58 @@
+import numpy as np
+import math
+
+def distance(point1, point2):
+    return np.linalg.norm(point1 - point2)
+
+def fabrik(target, joint_positions, link_lengths, tolerance=0.01, max_iterations=1000):
+    num_joints = len(joint_positions)
+    base = joint_positions[0]
+    end_effector = joint_positions[-1]
+    target_distance = distance(end_effector, target)
+    iteration = 0
+
+    while iteration < max_iterations and target_distance > tolerance:
+        # Forward reaching
+        joint_positions[-1] = target
+        for i in range(num_joints - 2, -1, -1):
+            direction = np.sign(distance(joint_positions[i + 1], joint_positions[i]) - link_lengths[i])
+            joint_positions[i] = joint_positions[i + 1] + direction * (joint_positions[i] - joint_positions[i + 1]) / np.linalg.norm(joint_positions[i] - joint_positions[i + 1]) * link_lengths[i]
+
+        # Backward reaching
+        joint_positions[0] = base
+        for i in range(1, num_joints):
+            direction = np.sign(distance(joint_positions[i - 1], joint_positions[i]) - link_lengths[i - 1])
+            joint_positions[i] = joint_positions[i - 1] + direction * (joint_positions[i] - joint_positions[i - 1]) / np.linalg.norm(joint_positions[i] - joint_positions[i - 1]) * link_lengths[i - 1]
+
+        end_effector = joint_positions[-1]
+        target_distance = distance(end_effector, target)
+        iteration += 1
+
+        # Output joint angles for each iteration
+        print(f"Iteration {iteration}:")
+        for i, pos in enumerate(joint_positions):
+            print(f"Joint {i + 1}: ({pos[0]:.2f}, {pos[1]:.2f})")
+
+    return joint_positions
+
+def is_reachable(target, joint_positions, link_lengths):
+    total_length = sum(link_lengths)
+    dist_to_target = np.linalg.norm(joint_positions[-1] - target)
+    return dist_to_target <= total_length
+
+# Link lengths and joint limits
+link_lengths = [23, 15, 7]  # Assuming the last digit of your roll number is 3
+joint_limits = [(0, 180)] * 4  # Assuming each joint has a 180-degree freedom
+
+# Initial joint positions
+initial_joint_positions = np.array([[0, 0], [23, 0], [38, 0], [45, 0]])
+
+# Target end-effector position (3D)
+target_position = np.array([50, 50, 50])
+
+# Run the FABRIK algorithm
+joint_positions = fabrik(target_position, initial_joint_positions, link_lengths)
+
+# Output reachability
+reachable = is_reachable(target_position, joint_positions, link_lengths)
+print("\nReachable:", reachable)
