@@ -1,0 +1,56 @@
+#include <opencv2/opencv.hpp>
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace cv;
+using namespace std;
+
+// Define colors for visualization
+const Scalar BLUE = Scalar(255, 0, 0);
+const Scalar YELLOW = Scalar(0, 255, 255);
+
+// Define grid cell types
+enum CellType { EMPTY, BLUE_CELL, YELLOW_CELL };
+
+// Define a structure to represent a cell in the grid
+struct Cell {
+    int x, y;
+    CellType type;
+    double cost;  // Cost to reach this cell
+    Cell* parent; // Parent cell in the path
+};
+
+// Define a comparison function for cells in the priority queue
+struct CompareCell {
+    bool operator()(const Cell* a, const Cell* b) {
+        return a->cost > b->cost; // Min heap based on cost
+    }
+};
+
+// Function to find the shortest path using A* algorithm
+vector<Cell*> findShortestPath(const Mat& grid, const Point& start, const Point& end) {
+    // Implement A* algorithm here
+}
+
+int main() {
+    Mat image = imread("grid_image_with_colors.jpg");
+
+    // Convert the image to a 2D grid representation
+    // Assume BLUE cells are represented as (0, 0, 255) and YELLOW cells are (0, 255, 255)
+
+    // Find the shortest path
+    vector<Cell*> path = findShortestPath(grid, Point(0, 0), Point(grid.cols - 1, grid.rows - 1));
+
+    // Highlight the path on the image
+    Mat result = image.clone();
+    for (Cell* cell : path) {
+        // Draw a rectangle or fill the cell with a color to highlight it
+        rectangle(result, Rect(cell->x * cell_width, cell->y * cell_height, cell_width, cell_height), YELLOW, FILLED);
+    }
+
+    // Display the result
+    imshow("Result", result);
+    waitKey(0);
+    return 0;
+}
