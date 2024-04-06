@@ -1,0 +1,25 @@
+#include <opencv2/opencv.hpp>
+#include <vector>
+
+using namespace cv;
+using namespace std;
+
+int main() {
+    Mat image = imread("grid_image.jpg");
+
+    // Image preprocessing (noise removal, if needed)
+
+    // Grid detection
+
+    // Path planning
+
+    // Display the result
+    imshow("Image", image);
+    waitKey(0);
+    return 0;
+}
+
+
+
+
+
